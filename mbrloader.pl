@@ -1,6 +1,4 @@
 #!/usr/bin/perl
-#use strict;
-#use warnings;
 my $file = $ARGV[0];
 my $output = "output";
 my $loader;
@@ -13,8 +11,12 @@ die("Failed to read from $file") if (read( $F, $stream, 512 ) != 512);
 $_=unpack "H4",substr($stream,510,2);
 if ($_ =~ /55aa/)
 {
-	print $O $stream;
-	exit 0;
+print $O $stream;
+close $F;
+close $O;
+system("ndisasm $output > dis.txt") == 0
+or die("ndisasm failure: $?");
+exit 0;
 }
 my $flag=0;
 while(<$F>){
@@ -25,10 +27,13 @@ if ($flag) {
         seek($F, -512, 1);
         read($F, $stream, 512);
         print $O $stream;
-        exit 0;
+close $F;
+close $O;
+system("ndisasm $output > dis.txt") == 0
+or die("ndisasm failure: $?");
+exit 0;
     }
 }
 $flag=1 if ($_ =~ /55/);
 }
-close $F;
-close $O;
+
