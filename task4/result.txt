@@ -3,3 +3,9 @@ $ time ./matrmul
 real    0m25.262s
 user    0m25.147s
 sys     0m0.000s
+
+$ time ./tilemul.exe
+
+real    0m7.058s
+user    0m6.973s
+sys     0m0.000s
