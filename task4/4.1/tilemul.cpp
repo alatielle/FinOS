@@ -24,7 +24,7 @@ int main()
 		{
 			int tilej=(j/TILES)*TILEV+j%TILES;		//tile col
 			for (k=0; k<S; ++k)
-				r[tilei+tilej]+=a[tilei+(k/TILES)*TILEV]*b[(k/TILES)*TILEV*TILENUM+tilej];
+				r[tilei+tilej]+=a[tilei+(k/TILES)*TILEV+k%TILES]*b[(k/TILES)*TILEV*TILENUM+(k%TILES)*TILES+tilej];
 		}
 	}
 	return r[rand()%S*S];
