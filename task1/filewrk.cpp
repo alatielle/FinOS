@@ -18,9 +18,10 @@ void closediap(int curstage)
 {
 	int	k;
 	for (k=curstage; k>=0; --k)
-		if(fclose(hndls[k])) {
-			pre("Can't close the file");
-		}
+		if (hndls[k]!=NULL)
+			if (fclose(hndls[k])) {
+				pre("Can't close the file");
+			}
 	free(hndls);	
 	return;
 }
@@ -53,11 +54,7 @@ int main(int argc, char *argv[])
 	{
 		if ((hndls[stage]=fopen(argv[stage+1], "r"))==NULL)
 		{
-			pre("Can't open the file for reading");
-			/* Так как к данному моменту была выделена память под массив дескрипторов, при ошибке нужно ее освободить.
-			Процедура closediap() закрывает выбранный диапазон файлов и освобождает память массива hndls. */
-			closediap(stage-1);
-			return 1;
+			pre("Can't open the file \""+argv[stage+1]+"\" for reading");
 		}
 	}
 	// Попробуем открыть последий файл на запись.
@@ -69,31 +66,25 @@ int main(int argc, char *argv[])
 		return 1;
 	}
 	// Теперь займемся сортировкой. Для хранения чисел используем вектор dgts.
-	try {
-		// Попытаемся извлечь числа из каждого файла, кроме последнего.
-		for (i=0; i<stage; ++i)
-		{
-			/* Функция fscanf возвращает количество успешно прочитанных записей (в нашем случае соответствующих типу Decimal integer),
-			которое в случае неудачи будет нулем. Если достигнут конец файла, будет возвращен EOF. Поместим считанные числа в вектор и отсортируем их. */
-			while ((test=fscanf(hndls[i],"%d",&j))>0)
-			{
-				dgts.push_back(j);
-			}
-			if (test!=EOF)
-			{
-				throw(exception("Bad file content"));
-			}
-		}
-		sort(dgts.begin(), dgts.end());
-		/* Если прочитать не удалось (не хватило памяти, содержимое файла не соответствует формату),
-		исключение будет обработано (очистка контейнера, закрытие открытых файлов), а работа аварийно завершена. */
-	} catch (exception e)
+	// Попытаемся извлечь числа из каждого файла, кроме последнего.
+	for (i=0; i<stage; ++i)
 	{
-		pre(e.what());
-		dgts.clear();
-		closediap(stage-1);
-		return 1;
+		/* Функция fscanf возвращает количество успешно прочитанных записей (в нашем случае соответствующих типу Decimal integer),
+		которое в случае неудачи будет нулем. Если достигнут конец файла, будет возвращен EOF. Поместим считанные числа в вектор и отсортируем их. */
+		if (hndls[i]==NULL)
+		{
+			continue;
+		}
+		while ((test=fscanf(hndls[i],"%d",&j))>0)
+		{
+			dgts.push_back(j);
+		}
+		if (test!=EOF)
+		{
+			pre("Bad file content");
+		}
 	}
+	sort(dgts.begin(), dgts.end());
 	// Попробуем вывести результаты в файл.
 	for(i=0; i<dgts.size(); i++)
 	{

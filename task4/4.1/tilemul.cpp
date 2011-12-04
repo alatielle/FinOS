@@ -2,36 +2,30 @@
 #include <algorithm>
 using namespace std;
 
+const int S=1024;
+const int TILES=32;
+const int TILENUM=S/TILES;
+const int TILEV=TILES*TILES;
 
-const int s=1536;
-const int bs=32;
-
-int a [s][s];
-int b [s][s];
-int r [s][s];
+volatile int a [S*S];
+volatile int b [S*S];
+int r [S*S];
 
 int main()
 {
-	int n1;
-	int n2;
-	int n3;
 	int i;
 	int j;
 	int k;
-	for (i=0; i<s; ++i)
-		for (j=0; j<s; ++j)
+	memset(r,0,S*S);
+	for (i=0; i<S; ++i)
+	{
+		int tilei=(i/TILES)*TILEV*TILENUM+(i%TILES)*TILES;	//tile row
+		for (j=0; j<S; ++j)
 		{
-			r[i][j]=0;
-			a[i][j]=rand()%32000;
-			b[i][j]=rand()%32000;
+			int tilej=(j/TILES)*TILEV+j%TILES;		//tile col
+			for (k=0; k<S; ++k)
+				r[tilei+tilej]+=a[tilei+(k/TILES)*TILEV]*b[(k/TILES)*TILEV*TILENUM+tilej];
 		}
-	for (n1=0; n1<s; n1+=32)
-		for (n2=0; n2<s; n2+=32)
-			for (n3=0; n3<s; n3+=32)
-				for (i=n1; i<min(n1+32,s); ++i)
-					for (j=n2; j<min(n2+32,s); ++j)
-						for (k=n3; k<min(n3+32,s); ++k)
-							r[i][j]+=a[i][k]*b[k][j];
-	//32*32
-	return 0;
+	}
+	return r[rand()%S*S];
 }
