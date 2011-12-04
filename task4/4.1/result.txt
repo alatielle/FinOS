@@ -1,11 +1,11 @@
-$ time ./matrmul
+$ time ./matrmul.exe
 
-real    0m25.262s
-user    0m25.147s
-sys     0m0.000s
+real    0m36.543s
+user    0m35.849s
+sys     0m0.030s
 
 $ time ./tilemul.exe
 
-real    0m7.058s
-user    0m6.973s
-sys     0m0.000s
+real    0m6.872s
+user    0m6.645s
+sys     0m0.062s
