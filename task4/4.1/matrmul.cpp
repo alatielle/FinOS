@@ -2,11 +2,10 @@
 #include <algorithm>
 using namespace std;
 
+const int s=1024;
 
-const int s=1536;
-
-int a [s][s];
-int b [s][s];
+volatile int a [s][s];
+volatile int b [s][s];
 int r [s][s];
 
 int main()
@@ -14,16 +13,10 @@ int main()
 	int i;
 	int j;
 	int k;
-	for (i=0; i<s; ++i)
-		for (j=0; j<s; ++j)
-		{
-			r[i][j]=0;
-			a[i][j]=rand()%32000;
-			b[i][j]=rand()%32000;
-		}
+	memset(r,0,s*s);
 	for (i=0; i<s; ++i)
 		for (j=0; j<s; ++j)
 			for (k=0; k<s; ++k)
 				r[i][j]+=a[i][k]*b[k][j];
-	return 0;
+	return r[rand()%s][rand()%s];
 }
