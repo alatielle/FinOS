@@ -1,0 +1,4 @@
+nasm  -f win32 g.asm
+gcc -c f.c
+gcc f.o g.obj -o f
+./f
