@@ -4,21 +4,31 @@ my $output = "output";
 my $loader;
 my $stream;
 my $found = 0;
-die "Argument needed!" if ( scalar(@ARGV) == 0 );
+if ( !scalar(@ARGV) ) {
+	die "Argument needed!";
+}
 open my $F, '<', $file or die "Can't open the file $file: $!";
 binmode $F;
-die "Failed to read from $file" if ( (read $F, $stream, 510) != 510 );
-while( (read $F, $_, 1)==1 ) {
+if ( (read $F, $stream, 510) != 510 ) {
+	die "Failed to read from $file";
+}
+while( (read $F, $_, 1) == 1 ) {
 	$_ = unpack "H2", $_;
 	if ( $_ eq "55" ) {
-		die "Failed to read from $file" if ( (read $F, $_, 1) != 1 );
+		if ( (read $F, $_, 1) != 1 ) {
+			die "Failed to read from $file";
+		}
 		$_ = unpack "H2", $_;
 		if ( $_ eq "aa" ) {
 			$found++;
 			open my $O, '>', $output;
 			binmode $O;
-			die "Failed to change position in $file" if ( (seek $F, -512, 1) != 1 );
-			die "Failed to read from $file" if ( (read $F, $stream, 512) != 512 );
+			if ( (seek $F, -512, 1) != 1 ) {
+				die "Failed to change position in $file";
+			}
+			if ( (read $F, $stream, 512) != 512 ) {
+				die "Failed to read from $file";
+			}
 			print $O $stream;
 			close $O;
 			system ( 'ndisasm '.$output.' > dis'.$found.'.txt' ) == 0 or die("ndisasm failure: $?");
