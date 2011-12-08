@@ -8,7 +8,7 @@ bool OK=true;
 vector <int> dgts;
 FILE ** hndls;
 
-void pre(const char* Cause)
+void pre(char* Cause)
 {
 	printf("Error: %s\n", Cause);
 	return;
@@ -29,7 +29,6 @@ void closediap(int curstage)
 int main(int argc, char *argv[])
 {
 	int	stage,i,j;
-	float f;
 	int test;
 	/* Начнем с того, что проверим, достаточно ли у нас аргументов для работы.
 	Нам нужны файл для записи отсортированных чисел и как минимум один файл для чтения.
@@ -54,7 +53,9 @@ int main(int argc, char *argv[])
 	{
 		if ((hndls[stage]=fopen(argv[stage+1], "r"))==NULL)
 		{
-			pre("Can't open the file \""+argv[stage+1]+"\" for reading");
+			//char * errdescr;
+			//sprintf(errdescr,"Can't open the file \"%s\" for reading",argv[stage+1]);
+			pre("Can't open the file for reading");
 		}
 	}
 	// Попробуем открыть последий файл на запись.
@@ -67,24 +68,32 @@ int main(int argc, char *argv[])
 	}
 	// Теперь займемся сортировкой. Для хранения чисел используем вектор dgts.
 	// Попытаемся извлечь числа из каждого файла, кроме последнего.
-	for (i=0; i<stage; ++i)
-	{
-		/* Функция fscanf возвращает количество успешно прочитанных записей (в нашем случае соответствующих типу Decimal integer),
-		которое в случае неудачи будет нулем. Если достигнут конец файла, будет возвращен EOF. Поместим считанные числа в вектор и отсортируем их. */
-		if (hndls[i]==NULL)
+	//try {
+		for (i=0; i<stage; ++i)
 		{
-			continue;
+			/* Функция fscanf возвращает количество успешно прочитанных записей (в нашем случае соответствующих типу Decimal integer),
+			которое в случае неудачи будет нулем. Если достигнут конец файла, будет возвращен EOF. Поместим считанные числа в вектор и отсортируем их. */
+			if (hndls[i]==NULL)
+			{
+				continue;
+			}
+			while ((test=fscanf(hndls[i],"%d",&j))>0)
+			{
+				dgts.push_back(j);
+			}
+			if (test!=EOF)
+			{
+				pre("Bad file content");
+			}
 		}
-		while ((test=fscanf(hndls[i],"%d",&j))>0)
-		{
-			dgts.push_back(j);
-		}
-		if (test!=EOF)
-		{
-			pre("Bad file content");
-		}
-	}
-	sort(dgts.begin(), dgts.end());
+		sort(dgts.begin(), dgts.end());
+	//} catch (exception e)
+	//{
+	//	dgts.clear();
+	//	pre("Fatal error");
+	//	closediap(stage);
+	//	return 1;
+	//}
 	// Попробуем вывести результаты в файл.
 	for(i=0; i<dgts.size(); i++)
 	{
