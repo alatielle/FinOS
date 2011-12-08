@@ -1,4 +1,5 @@
-extern void printc() {
-        *(char *)0xb8000 = 'A'; 
+void f()
+{
+*(short int *) 0xb8000 = 0x151;
+return;
 }
-
