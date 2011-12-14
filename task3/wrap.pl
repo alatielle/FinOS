@@ -5,6 +5,10 @@ $outp='1.txt';
 open O,'>',$outp.'.bin.asm' or die("Error: $!");
 open F,'<','1.txt' or die("Error: $!");
 binmode F;
+(undef,undef,undef,undef,undef,undef,undef,$size,
+       undef,undef,undef,undef,undef)
+           = stat(F);
+die ("Too large") if ($size>512*32);
 my $filebuf;
 read(F,$filebuf,512*32) or die("Error: $!");
 $crc = crc32($filebuf);
@@ -19,11 +23,27 @@ mov es,ax
 mov sp,0xffff
 sti
 mov ah, 2
-mov al,'.(length($filebuf)%512==0?(int (length($filebuf)/512) + 2):(int (length($filebuf)/512) + 3))."\n".
-'mov cx, 2
-mov bx, crctab
+mov al,'.(length($filebuf)%512==0?(int (length($filebuf)/512) ):(int (length($filebuf)/512) + 1))."\n".
+'mov cx, 4
+mov bx, buf
 int 0x13
 jc	@err
+mov cx,sp
+sub cx,4
+pushfd
+cmp cx,sp
+je ok32
+popfd
+mov	bp,not32str
+mov	bx,4
+mov ah,3
+int 0x10
+mov	cx,18
+mov	ax,0x1301
+int	0x10
+jmp @a
+ok32:
+popfd
 mov ecx, 0
 xor di, di
 _tab:
@@ -60,6 +80,9 @@ calc:
 	mov	eax,ebx
 loop calc
 xor eax, 0xFFFFFFFF
+;;;
+
+;;;
 cmp	eax,[crc]
 je	crcok
 mov	bp,failstr
@@ -76,8 +99,10 @@ int	0x10
     int 0x10
     mov	cx,24
     mov	ax,0x1301
-    int	0x10
+;    int	0x10
 @a:
+cli
+hlt
 jmp	@a
 crcok:
 mov	si,buf
@@ -92,6 +117,7 @@ jnz	fileout
 jmp	@a
 failstr: db \'CRC not equal! \'
 errstr: db \'Error. Execution stopped.\'
+not32str: db \'Error. Not 32-bit.\'
 len: dd '.length($filebuf)."\n".
 'crc: dd '."0x$crc\n".
 'times 510-($-$$) db 0
