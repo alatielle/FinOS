@@ -1,18 +1,8 @@
-org 0x7c00
-jmp 0x0:start
-start:
+extern	setgpf
+extern	testgpf
+
+;org	0x8200
 cli
-xor ax,ax
-mov ss,ax
-mov ds,ax
-mov es,ax
-mov sp,0xffff
-sti
-mov ah, 2
-mov al,1
-mov cx, 2
-mov bx, buf
-int 0x13
 lgdt	[seg0ptr]
 mov eax, cr0
 or eax, 1
@@ -44,12 +34,8 @@ mov ax, 16
 mov ds, ax
 mov ss, ax
 mov esp, 0x10000
-
-call	buf
-loo:
-cli
-hlt
-jmp	loo
-times 510-($-$$) db 0
-db 0x55,0xaa
-buf:
+mov     word [0xB8000], 0x0730
+call	setgpf
+sti
+call	testgpf
+jmp	$
