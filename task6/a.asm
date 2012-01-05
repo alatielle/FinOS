@@ -13,6 +13,7 @@ mov al,1
 mov cx, 2
 mov bx, buf
 int 0x13
+cli
 lgdt	[seg0ptr]
 mov eax, cr0
 or eax, 1
@@ -44,7 +45,7 @@ mov ax, 16
 mov ds, ax
 mov ss, ax
 mov esp, 0x10000
-
+sti
 call	buf
 loo:
 cli
