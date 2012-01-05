@@ -1,7 +1,8 @@
 #include "stdint.h"
 
-extern void idt_ld(uint32_t);
-extern void gpfhandler(void);
+void idt_ld(uint32_t);
+void gpfhandler(void);
+void clrscr(void);
 
 struct idt_entry_s
 {
@@ -34,21 +35,27 @@ void idt_set_gate(uint8_t num, uint32_t base, uint16_t sel, uint8_t flags)
 	idt_entries[num].flags = flags;
 } 
 
-void setgpf()
+extern void setgpf()
 {
 	idt_ptr.limit = sizeof(idt_entry_t) * 256 -1;
 	idt_ptr.base = (uint32_t)&idt_entries;
-
-	memset(&idt_entries, 0, sizeof(idt_entry_t)*256);
 	int i;
 	for (i=0; i<13; ++i)
 		idt_set_gate( 0, 0 , 0x08, 0x0E);
 	idt_set_gate( 13, (uint32_t)gpfhandler , 0x08, 0x8E);
+	for (i=14; i<256; ++i)
+		idt_set_gate( 0, 0 , 0x08, 0x0E);
 	idt_ld((uint32_t)&idt_ptr);
 	return;
 }
 
-void testgpf()
+extern void testgpf()
 {
+	clrscr();
+	//asm volatile ("int $0x10");
+	//*(short int *) 0xb8000 = 0x300+'t';
+	//*(short int *) 0xFFFFFFFF = 2;
+	//gpfhandler();
+	//*(short int *) 0xb8000 = 0x300+'f';
 	return;
 }
