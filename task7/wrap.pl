@@ -1,9 +1,9 @@
 #!/usr/bin/perl
 eval("use String::CRC32;");
 die ("no String::CRC32 module was found. Please install it.") if $@;
-$outp='1.txt';
+$outp='s';
 open O,'>',$outp.'.bin.asm' or die("Error: $!");
-open F,'<','1.txt' or die("Error: $!");
+open F,'<','s' or die("Error: $!");
 binmode F;
 (undef,undef,undef,undef,undef,undef,undef,$size,
        undef,undef,undef,undef,undef)
@@ -15,6 +15,8 @@ $crc = crc32($filebuf);
 $crc=sprintf("%X",$crc);
 close F;
 $asm='org 0x7c00
+jmp	0x0:start
+start:
 cli
 xor ax,ax
 mov ss,ax
@@ -28,15 +30,12 @@ mov al,'.(length($filebuf)%512==0?(int (length($filebuf)/512) ):(int (length($fi
 mov bx, buf
 int 0x13
 jc	@err
-pushf
-pop ax
-and ax,0F000h
-cmp ax,0
-je failproc
-cmp ax,0F000h
-jne ok32
-failproc:
-popf
+mov cx,sp
+sub cx,4
+pushfd
+cmp cx,sp
+je ok32
+popfd
 mov	bp,not32str
 mov	bx,4
 mov ah,3
@@ -46,7 +45,7 @@ mov	ax,0x1301
 int	0x10
 jmp @a
 ok32:
-popf
+popfd
 mov ecx, 0
 xor di, di
 _tab:
@@ -108,7 +107,7 @@ cli
 hlt
 jmp	@a
 crcok:
-jmp	buf
+jmp	0x0:buf
 failstr: db \'CRC not equal! \'
 errstr: db \'Error. Execution stopped.\'
 not32str: db \'Error. Not 32-bit.\'
