@@ -60,12 +60,6 @@ aft:
 	call	_setgpf
 	sti
 	call	_testgpf
-	mov	ebx,-1
-	mov	eax,somestr
-	push	eax
-	push	edx
-	call	_printstring
-	add	esp,8
 	cli
 	hlt
 	jmp	$
