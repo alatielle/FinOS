@@ -22,7 +22,7 @@ _gpfhandler:
 	; mov	[curpos],edx
 	; add	esp,8
 ;
-	mov	edx,[esp+0x1c]
+	mov	edx,[esp+0x4]
 	push	edx
 	mov	edx,[curpos]
 	push	edx
