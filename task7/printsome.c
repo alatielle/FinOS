@@ -13,6 +13,27 @@ extern void printint(int curpos,short int symb)
 	return;
 }
 
+extern void printhex(int curpos,int val)
+{
+	int t;
+	t=val;
+	int	d;
+	d=28;
+	char c;
+	while (d>=0)
+	{
+		c=(t>>d)&0xf;
+		if (c<10)
+			c+='0';
+		else
+			c+='A'-10;
+		*(short int *) curpos = 0x700 + c;
+		d-=4;
+		curpos+=2;
+	}
+	return;
+}
+
 extern void printstring(int curpos,int strstart)
 {
 	int	i=strstart;

@@ -60,6 +60,11 @@ aft:
 	call	_setgpf
 	sti
 	call	_testgpf
+	jmp	0x8:failpoint
+dd 0xdeadb00b
+failpoint:
+	jmp	0x10:next
+next:
 	cli
 	hlt
 	jmp	$

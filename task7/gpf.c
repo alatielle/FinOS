@@ -53,9 +53,17 @@ extern void testgpf()
 {
 	clrscr();
 	//asm volatile ("int $0x10");
-	//*(short int *) 0xb8000 = 0x300+'t';
+	*(short int *) 0xb8000 = 0x300+'t';
 	//*(short int *) 0xFFFFFFFF = 2;
 	//gpfhandler();
 	//*(short int *) 0xb8000 = 0x300+'f';
+	short int i;
+	int j;
+	j=0xbbbbbb;
+	while (j<0xffffff)
+	{
+		i = *(short int *) j;
+		j+=2;
+	}
 	return;
 }
